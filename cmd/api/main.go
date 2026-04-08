@@ -27,6 +27,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 
+	_ "github.com/insider/notification-system/docs"
 	appNotification "github.com/insider/notification-system/internal/application/notification"
 	httpAdapter "github.com/insider/notification-system/internal/adapters/http"
 	pgAdapter "github.com/insider/notification-system/internal/adapters/postgres"

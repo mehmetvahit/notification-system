@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   api:
     build: .
@@ -7,11 +6,11 @@ services:
     environment:
       - DATABASE_DSN=postgres://postgres:postgres@postgres:5432/notifications?sslmode=disable
       - REDIS_ADDR=redis:6379
-      - WEBHOOK_URL=https://webhook.site/your-uuid-here
-      - SERVER_PORT=8080
-      - WORKERS_PER_CHANNEL=5
-      - MAX_RETRIES=3
-      - RETRY_BASE_DELAY=1s
+      - WEBHOOK_URL=${WEBHOOK_URL}
+      - SERVER_PORT=${SERVER_PORT:-8080}
+      - WORKERS_PER_CHANNEL=${WORKERS_PER_CHANNEL:-5}
+      - MAX_RETRIES=${MAX_RETRIES:-3}
+      - RETRY_BASE_DELAY=${RETRY_BASE_DELAY:-1s}
     depends_on:
       postgres:
         condition: service_healthy

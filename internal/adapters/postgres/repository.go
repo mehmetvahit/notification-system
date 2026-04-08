@@ -53,7 +53,7 @@ func (r *Repository) Create(ctx context.Context, n *domain.Notification) error {
 			retry_count, max_retries, created_at, updated_at
 		) VALUES (
 			$1, $2, $3, $4, $5, $6, $7, $8,
-			NULLIF($9, ''), NULLIF($10::text, '')::uuid, $11, $12, $13,
+			NULLIF($9::text, '')::uuid, $10, $11, $12, $13,
 			$14, $15
 		)`
 
@@ -72,14 +72,13 @@ func (r *Repository) Create(ctx context.Context, n *domain.Notification) error {
 
 	_, err = r.pool.Exec(ctx, query,
 		n.ID, batchID, n.Recipient, string(n.Channel), n.Content,
-		string(n.Status), string(n.Priority), idempotencyKey, idempotencyKey,
-		templateID, n.ScheduledAt, n.RetryCount, n.MaxRetries,
+		string(n.Status), string(n.Priority), idempotencyKey,
+		templateID, varsJSON, n.ScheduledAt, n.RetryCount, n.MaxRetries,
 		n.CreatedAt, n.UpdatedAt,
 	)
 	if err != nil {
 		return fmt.Errorf("insert notification: %w", err)
 	}
-	_ = varsJSON
 	return nil
 }
 

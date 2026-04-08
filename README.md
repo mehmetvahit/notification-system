@@ -273,4 +273,32 @@ Prometheus metrics exposed at `/metrics`:
 - `http_request_duration_seconds{method,path,status}` - HTTP latency
 - `http_requests_total{method,path,status}` - HTTP request count
 
-Grafana dashboard: Import the Prometheus datasource pointing to `http://prometheus:9090`.
+## Grafana
+
+Grafana is included in the Docker Compose stack and auto-provisioned with Prometheus as the default datasource.
+
+**Start all services:**
+```bash
+docker-compose up -d
+```
+
+**Access Grafana:**
+- URL: `http://localhost:3000`
+- Username: `admin`
+- Password: `admin`
+
+> Prometheus datasource is configured automatically — no manual setup needed.
+
+**Create a dashboard:**
+1. Go to **Dashboards → New → New Dashboard → Add visualization**
+2. Select **Prometheus** as the data source
+3. Use any of the queries below:
+
+| Panel | PromQL |
+|-------|--------|
+| Notifications sent | `notification_sent_total` |
+| Notifications failed | `notification_failed_total` |
+| Queue depth | `notification_queue_depth` |
+| Delivery latency (p99) | `histogram_quantile(0.99, rate(notification_processing_duration_seconds_bucket[5m]))` |
+| HTTP request rate | `rate(http_requests_total[1m])` |
+| Active workers | `notification_active_workers` |

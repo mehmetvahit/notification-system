@@ -1,0 +1,243 @@
+{
+  "info": {
+    "name": "Notification System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "notification_id",
+      "value": ""
+    },
+    {
+      "key": "batch_id",
+      "value": ""
+    },
+    {
+      "key": "template_id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Create Notification",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.id) pm.collectionVariables.set('notification_id', json.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{base_url}}/api/v1/notifications",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recipient\": \"user@example.com\",\n  \"channel\": \"email\",\n  \"content\": \"Hello! Your order has shipped.\",\n  \"priority\": \"high\",\n  \"idempotency_key\": \"order-123-shipped\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Create Notification (SMS)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{base_url}}/api/v1/notifications",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recipient\": \"+15551234567\",\n  \"channel\": \"sms\",\n  \"content\": \"Your verification code is 482910.\",\n  \"priority\": \"high\",\n  \"idempotency_key\": \"sms-otp-482910\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Create Notification (Push)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{base_url}}/api/v1/notifications",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recipient\": \"device-token-abc123\",\n  \"channel\": \"push\",\n  \"content\": \"You have a new message.\",\n  \"priority\": \"normal\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Schedule Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{base_url}}/api/v1/notifications",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recipient\": \"user@example.com\",\n  \"channel\": \"push\",\n  \"content\": \"Your weekly summary is ready.\",\n  \"scheduled_at\": \"2026-04-20T09:00:00Z\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Create Batch",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.batch_id) pm.collectionVariables.set('batch_id', json.batch_id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{base_url}}/api/v1/notifications/batch",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notifications\": [\n    {\"recipient\": \"+15551234567\", \"channel\": \"sms\", \"content\": \"Sale ends tonight!\"},\n    {\"recipient\": \"user@example.com\", \"channel\": \"email\", \"content\": \"Sale ends tonight!\"}\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Notification",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/notifications/{{notification_id}}"
+          }
+        },
+        {
+          "name": "Get Batch",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/notifications/batch/{{batch_id}}"
+          }
+        },
+        {
+          "name": "List Notifications",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/notifications?page=1&page_size=20",
+              "query": [
+                { "key": "status", "value": "sent", "disabled": true },
+                { "key": "channel", "value": "email", "disabled": true },
+                { "key": "page", "value": "1" },
+                { "key": "page_size", "value": "20" }
+              ],
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "notifications"]
+            }
+          }
+        },
+        {
+          "name": "Cancel Notification",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/api/v1/notifications/{{notification_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Templates",
+      "item": [
+        {
+          "name": "Create Template",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.id) pm.collectionVariables.set('template_id', json.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{base_url}}/api/v1/templates",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"welcome\",\n  \"channel\": \"email\",\n  \"content\": \"Hello {{.Name}}, welcome to Insider!\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Template",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/templates/{{template_id}}"
+          }
+        },
+        {
+          "name": "Send Notification with Template",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{base_url}}/api/v1/notifications",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recipient\": \"new@example.com\",\n  \"channel\": \"email\",\n  \"template_id\": \"{{template_id}}\",\n  \"template_vars\": {\"Name\": \"Alice\"}\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Metrics",
+      "item": [
+        {
+          "name": "Application Metrics",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/metrics"
+          }
+        },
+        {
+          "name": "Prometheus Metrics",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/metrics"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -106,6 +106,36 @@ Interactive Swagger UI: `http://localhost:8080/swagger/index.html`
 | GET | `/health` | Health check |
 | GET | `/ws` | WebSocket for real-time updates |
 
+### Postman Collection
+
+A ready-to-use Postman collection is included at `notification-system.postman_collection.json`.
+
+**Import:**
+1. Open Postman → click **Import** (top left)
+2. Select `notification-system.postman_collection.json`
+3. The collection appears in your sidebar
+
+**Collection variables** (edit via the collection's *Variables* tab):
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `base_url` | `http://localhost:8080` | API base URL |
+| `notification_id` | _(auto-filled)_ | Set automatically after **Create Notification** |
+| `batch_id` | _(auto-filled)_ | Set automatically after **Create Batch** |
+| `template_id` | _(auto-filled)_ | Set automatically after **Create Template** |
+
+**Recommended flow:**
+1. **Health Check** — confirm the server is up
+2. **Create Template** → `template_id` is auto-saved
+3. **Create Notification** → `notification_id` is auto-saved
+4. **Get Notification** — uses the saved `notification_id`
+5. **Create Batch** → `batch_id` is auto-saved
+6. **Get Batch** — uses the saved `batch_id`
+7. **Send Notification with Template** — uses the saved `template_id`
+8. **Cancel Notification** — uses the saved `notification_id`
+
+> The **List Notifications** request has `status` and `channel` query params pre-configured but disabled. Enable them in the *Params* tab to filter results.
+
 ### curl Examples
 
 **Create a notification:**

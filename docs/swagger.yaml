@@ -1,0 +1,398 @@
+basePath: /
+definitions:
+  github_com_insider_notification-system_internal_application_notification.BatchResponse:
+    properties:
+      batch_id:
+        type: string
+      notifications:
+        items:
+          $ref: '#/definitions/github_com_insider_notification-system_internal_application_notification.NotificationResponse'
+        type: array
+      total:
+        type: integer
+    type: object
+  github_com_insider_notification-system_internal_application_notification.CreateBatchRequest:
+    properties:
+      notifications:
+        items:
+          $ref: '#/definitions/github_com_insider_notification-system_internal_application_notification.CreateNotificationRequest'
+        maxItems: 1000
+        minItems: 1
+        type: array
+    required:
+    - notifications
+    type: object
+  github_com_insider_notification-system_internal_application_notification.CreateNotificationRequest:
+    properties:
+      channel:
+        enum:
+        - sms
+        - email
+        - push
+        type: string
+      content:
+        type: string
+      idempotency_key:
+        type: string
+      priority:
+        enum:
+        - high
+        - normal
+        - low
+        type: string
+      recipient:
+        type: string
+      scheduled_at:
+        type: string
+      template_id:
+        type: string
+      template_vars:
+        additionalProperties:
+          type: string
+        type: object
+    required:
+    - channel
+    - recipient
+    type: object
+  github_com_insider_notification-system_internal_application_notification.CreateTemplateRequest:
+    properties:
+      channel:
+        enum:
+        - sms
+        - email
+        - push
+        type: string
+      content:
+        type: string
+      name:
+        type: string
+    required:
+    - channel
+    - content
+    - name
+    type: object
+  github_com_insider_notification-system_internal_application_notification.ListResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/github_com_insider_notification-system_internal_application_notification.NotificationResponse'
+        type: array
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  github_com_insider_notification-system_internal_application_notification.MetricsResponse:
+    properties:
+      avg_latency_ms:
+        type: number
+      failure_rate:
+        type: number
+      queue_depth:
+        additionalProperties:
+          format: int64
+          type: integer
+        type: object
+      success_rate:
+        type: number
+      total_failed:
+        type: integer
+      total_pending:
+        type: integer
+      total_sent:
+        type: integer
+    type: object
+  github_com_insider_notification-system_internal_application_notification.NotificationResponse:
+    properties:
+      batch_id:
+        type: string
+      channel:
+        type: string
+      content:
+        type: string
+      created_at:
+        type: string
+      error:
+        type: string
+      id:
+        type: string
+      idempotency_key:
+        type: string
+      priority:
+        type: string
+      recipient:
+        type: string
+      retry_count:
+        type: integer
+      scheduled_at:
+        type: string
+      sent_at:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  github_com_insider_notification-system_internal_application_notification.TemplateResponse:
+    properties:
+      channel:
+        type: string
+      content:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: mete.vahi@insider.com
+    name: Insider Engineering
+  description: Event-Driven Notification System with hexagonal architecture
+  termsOfService: http://swagger.io/terms/
+  title: Notification System API
+  version: "1.0"
+paths:
+  /api/v1/metrics:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_insider_notification-system_internal_application_notification.MetricsResponse'
+      summary: Get system metrics
+      tags:
+      - metrics
+  /api/v1/notifications:
+    get:
+      parameters:
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      - description: Filter by channel
+        in: query
+        name: channel
+        type: string
+      - description: Page number (default 1)
+        in: query
+        name: page
+        type: integer
+      - description: Page size (default 20)
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_insider_notification-system_internal_application_notification.ListResponse'
+      summary: List notifications with filtering and pagination
+      tags:
+      - notifications
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Notification payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_insider_notification-system_internal_application_notification.CreateNotificationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_insider_notification-system_internal_application_notification.NotificationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a single notification
+      tags:
+      - notifications
+  /api/v1/notifications/{id}:
+    delete:
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Cancel a notification
+      tags:
+      - notifications
+    get:
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_insider_notification-system_internal_application_notification.NotificationResponse'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get notification by ID
+      tags:
+      - notifications
+  /api/v1/notifications/batch:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Batch payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_insider_notification-system_internal_application_notification.CreateBatchRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_insider_notification-system_internal_application_notification.BatchResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a batch of notifications
+      tags:
+      - notifications
+  /api/v1/notifications/batch/{batchId}:
+    get:
+      parameters:
+      - description: Batch ID
+        in: path
+        name: batchId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_insider_notification-system_internal_application_notification.BatchResponse'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all notifications in a batch
+      tags:
+      - notifications
+  /api/v1/templates:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Template payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_insider_notification-system_internal_application_notification.CreateTemplateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_insider_notification-system_internal_application_notification.TemplateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a message template
+      tags:
+      - templates
+  /api/v1/templates/{id}:
+    get:
+      parameters:
+      - description: Template ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_insider_notification-system_internal_application_notification.TemplateResponse'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get template by ID
+      tags:
+      - templates
+  /health:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check
+      tags:
+      - health
+schemes:
+- http
+- https
+swagger: "2.0"

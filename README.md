@@ -204,12 +204,47 @@ curl -X DELETE http://localhost:8080/api/v1/notifications/<id>
 ```
 
 **WebSocket real-time updates:**
+
+The WebSocket endpoint streams notification status changes in real time as the worker processes them.
+
+*Option 1 — Browser Console (quickest):*
+
+Open any page in your browser, press **F12 → Console** and run:
 ```javascript
 const ws = new WebSocket('ws://localhost:8080/ws');
-ws.onmessage = (event) => {
-  const notification = JSON.parse(event.data);
-  console.log('Status update:', notification);
-};
+ws.onopen    = () => console.log('Connected');
+ws.onmessage = (event) => console.log('Update:', JSON.parse(event.data));
+ws.onclose   = () => console.log('Disconnected');
+```
+Then create a notification — the status update will appear in the console automatically.
+
+*Option 2 — Postman:*
+
+1. Postman → **New → WebSocket**
+2. URL: `ws://localhost:8080/ws`
+3. Click **Connect**
+4. Send a notification from another tab — updates appear in the **Messages** panel in real time
+
+*Option 3 — curl.exe:*
+```powershell
+curl.exe --include --no-buffer `
+  -H "Connection: Upgrade" `
+  -H "Upgrade: websocket" `
+  -H "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==" `
+  -H "Sec-WebSocket-Version: 13" `
+  http://localhost:8080/ws
+```
+
+**Example WebSocket message payload:**
+```json
+{
+  "id": "cf29a68c-5501-418a-867d-b9d924f2a663",
+  "recipient": "user@example.com",
+  "channel": "email",
+  "status": "sent",
+  "priority": "high",
+  "updated_at": "2026-04-08T11:13:00Z"
+}
 ```
 
 ## Environment Variables

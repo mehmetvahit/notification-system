@@ -298,6 +298,47 @@ func (h *Handler) HealthCheck(c *gin.Context) {
 	})
 }
 
+// --- Broadcast ---
+
+// BroadcastMessageRequest is the HTTP body for POST /api/v1/broadcast.
+type BroadcastMessageRequest struct {
+	UserID string `json:"user_id" binding:"required"`
+	Text   string `json:"text" binding:"required"`
+}
+
+// BroadcastMessage is the payload pushed over the WebSocket hub.
+type BroadcastMessage struct {
+	Type      string    `json:"type"`
+	UserID    string    `json:"user_id"`
+	Text      string    `json:"text"`
+	Timestamp time.Time `json:"timestamp"`
+}
+
+// BroadcastMessage godoc
+// @Summary      Broadcast a text message from a user to all WebSocket clients
+// @Tags         broadcast
+// @Accept       json
+// @Produce      json
+// @Param        request body BroadcastMessageRequest true "Broadcast payload"
+// @Success      202 {object} BroadcastMessage
+// @Failure      400 {object} map[string]string
+// @Router       /api/v1/broadcast [post]
+func (h *Handler) BroadcastMessage(c *gin.Context) {
+	var req BroadcastMessageRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	msg := BroadcastMessage{
+		Type:      "message",
+		UserID:    req.UserID,
+		Text:      req.Text,
+		Timestamp: time.Now().UTC(),
+	}
+	h.hub.Broadcast(msg)
+	c.JSON(http.StatusAccepted, msg)
+}
+
 // --- WebSocket ---
 
 // WebSocketHandler handles WebSocket upgrade and registers the client with the hub.

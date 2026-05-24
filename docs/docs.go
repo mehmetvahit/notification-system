@@ -19,6 +19,48 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/broadcast": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "broadcast"
+                ],
+                "summary": "Broadcast a text message from a user to all WebSocket clients",
+                "parameters": [
+                    {
+                        "description": "Broadcast payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_adapters_http.BroadcastMessageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "$ref": "#/definitions/internal_adapters_http.BroadcastMessage"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/metrics": {
             "get": {
                 "produces": [
@@ -599,6 +641,38 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_adapters_http.BroadcastMessage": {
+            "type": "object",
+            "properties": {
+                "text": {
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_adapters_http.BroadcastMessageRequest": {
+            "type": "object",
+            "required": [
+                "text",
+                "user_id"
+            ],
+            "properties": {
+                "text": {
+                    "type": "string"
+                },
+                "user_id": {
                     "type": "string"
                 }
             }

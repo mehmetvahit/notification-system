@@ -53,6 +53,8 @@ func NewRouter(handler *Handler, log *zap.Logger, m *metrics.Metrics) *gin.Engin
 		}
 
 		v1.GET("/metrics", handler.GetMetrics)
+
+		v1.POST("/broadcast", handler.BroadcastMessage)
 	}
 
 	return router

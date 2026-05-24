@@ -148,6 +148,27 @@ definitions:
       name:
         type: string
     type: object
+  internal_adapters_http.BroadcastMessage:
+    properties:
+      text:
+        type: string
+      timestamp:
+        type: string
+      type:
+        type: string
+      user_id:
+        type: string
+    type: object
+  internal_adapters_http.BroadcastMessageRequest:
+    properties:
+      text:
+        type: string
+      user_id:
+        type: string
+    required:
+    - text
+    - user_id
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -158,6 +179,33 @@ info:
   title: Notification System API
   version: "1.0"
 paths:
+  /api/v1/broadcast:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Broadcast payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_adapters_http.BroadcastMessageRequest'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/internal_adapters_http.BroadcastMessage'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Broadcast a text message from a user to all WebSocket clients
+      tags:
+      - broadcast
   /api/v1/metrics:
     get:
       produces:

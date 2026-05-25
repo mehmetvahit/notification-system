@@ -3,6 +3,7 @@ package http
 import (
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -302,8 +303,8 @@ func (h *Handler) HealthCheck(c *gin.Context) {
 
 // BroadcastMessageRequest is the HTTP body for POST /api/v1/broadcast.
 type BroadcastMessageRequest struct {
-	UserID string `json:"user_id" binding:"required"`
-	Text   string `json:"text" binding:"required"`
+	UserID string `json:"user_id" binding:"required,max=128"`
+	Text   string `json:"text" binding:"required,max=4096"`
 }
 
 // BroadcastMessage is the payload pushed over the WebSocket hub.
@@ -327,6 +328,10 @@ func (h *Handler) BroadcastMessage(c *gin.Context) {
 	var req BroadcastMessageRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if strings.TrimSpace(req.UserID) == "" || strings.TrimSpace(req.Text) == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user_id and text must not be blank"})
 		return
 	}
 	msg := BroadcastMessage{

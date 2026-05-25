@@ -162,8 +162,10 @@ definitions:
   internal_adapters_http.BroadcastMessageRequest:
     properties:
       text:
+        maxLength: 4096
         type: string
       user_id:
+        maxLength: 128
         type: string
     required:
     - text

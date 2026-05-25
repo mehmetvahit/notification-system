@@ -670,10 +670,12 @@ const docTemplate = `{
             ],
             "properties": {
                 "text": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 4096
                 },
                 "user_id": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 128
                 }
             }
         }
